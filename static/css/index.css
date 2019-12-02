@@ -1,0 +1,48 @@
+.container {
+    display: flex;
+}
+
+.container > div {
+    flex: 1;
+    margin: 10px;
+}
+
+.container > div > div {
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 0.9em;
+    padding: 5px;
+    word-break: break-word;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    resize: none;
+}
+
+div[contenteditable] {
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+span.removed {
+    background-color: #ffaeb1;
+    color: #6a000a;
+}
+
+span.removed.marker {
+    border: 1px solid #ffaeb1;
+}
+
+span.added {
+    background-color: #aeffb1;
+    color: #005a00;
+}
+
+span.added.marker {
+    border: 1px solid #aeffb1;
+}
+
+span.active {
+    border-bottom: 2px solid black;
+}

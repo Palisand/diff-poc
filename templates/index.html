@@ -1,0 +1,36 @@
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="https://unpkg.com/diff@4.0.1/dist/diff.min.js"></script>
+    <!-- https://github.com/kpdecker/jsdiff -->
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</head>
+<body>
+    <div>
+        <p>
+            Diff by:
+            <input type="radio" name="diff-type" value="word">Word</input>
+            <input type="radio" name="diff-type" value="char" checked>Character</input>
+        </p>
+        <p>
+            Add line breaks on changes:
+            <input type="checkbox" id="add-breaks" name="add-breaks" />
+        </p>
+        <p>Use <strong>Page Up</strong> and <strong>Page Down</strong> to cycle through changes.</p>
+    </div>
+    <div class="container">
+        <div>
+            <h3>Before</h3>
+            <div class="content" id="text1">{{ text1 }}</div>
+        </div>
+        <div>
+            <h3>After</h3>
+            <div class="content" id="text2" contenteditable>{{ text2 }}</div>
+        </div>
+        <div>
+            <h3>Combined Diff</h3>
+            <div class="content" id="text3"></div>
+        </div>
+    </div>
+</body>
+</html>
