@@ -1,3 +1,46 @@
+let tippyIndex = 0;
+
+function toggleTooltips(currentId, nextId, advanceIndex) {
+    document.getElementById(currentId)._tippy.hide();
+    document.getElementById(nextId)._tippy.show();
+    if (advanceIndex) {
+        tippyIndex++;
+    }
+}
+
+function fillSpanAndToggleTooltips(id, nextId, value) {
+    const span = document.getElementById(id);
+    span.innerText = value;
+    span.classList.remove('removed', 'marker');
+    toggleTooltips(id, nextId, false);
+}
+
+function generateTippyContent(id, nextId, part) {
+    return (
+`<div style="text-align: center">
+    <div>
+        "${part.value}" was
+        <span style="color: ${part.added ? 'greenyellow' : 'red'}">
+            ${part.added ? 'ADDED' : 'REMOVED'}
+        </span>
+    </div>
+    <button onclick="toggleTooltips('${id}', '${nextId}', true)">Accept</button>
+    <button onclick="fillSpanAndToggleTooltips('${id}', '${nextId}', '${part.added ? "" : part.value}')">Reject</button>
+</div>`
+    )
+}
+
+function cleanText(content) {
+    // replace non-breaking spaces with spaces
+    return content.replace(/\s/g, " ");
+}
+
+function generate_id() {
+    // https://gist.github.com/gordonbrander/2230317
+    return `i${Math.random().toString(36).substr(2, 9)}`;
+}
+
+
 document.addEventListener("DOMContentLoaded", function() {
     const text1 = document.getElementById("text1");
     const text2 = document.getElementById("text2");
@@ -5,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const range = document.createRange();
     const sel = window.getSelection();
+    let tippies = [];
 
     function moveTextCursor(node, position) {
         range.setStart(node, position);
@@ -54,12 +98,14 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    function cleanText(content) {
-        // replace non-breaking spaces with spaces
-        return content.replace(/\s/g, " ");
+    function destroyAllTippies() {
+        tippies.forEach(tippy => tippy.destroy());
+        tippies.length = 0;
     }
 
     function diffIt() {
+        destroyAllTippies();
+
         const diffType = getCheckedRadioValue("diff-type");
         const addBreaks = document.getElementById("add-breaks").checked;
         const diff = {
@@ -74,18 +120,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const cursorPosition = getCursorPosition(text2);
 
+        const ids2part = {};
         diff.forEach((part) => {
             if (part.added) {
-                const content = `<span class="added">${part.value}</span>${br}`;
-                text2_content += content;
-                text3_content += content;
+                const id = generate_id();
+                ids2part[id] = part;
+                text2_content += `<span id="${id}" class="added">${part.value}</span>${br}`;
+                text3_content += `<span class="added">${part.value}</span>${br}`;
                 text1_content += `<span class="added marker"></span>${br}`;
             }
             else if (part.removed) {
+                const id = generate_id();
+                ids2part[id] = part;
                 const content = `<span class="removed">${part.value}</span>${br}`;
                 text1_content += content;
                 text3_content += content;
-                text2_content += `<span class="removed marker"></span>${br}`;
+                text2_content += `<span id="${id}" class="removed marker"></span>${br}`;
             }
             else {
                 text1_content += part.value;
@@ -96,6 +146,24 @@ document.addEventListener("DOMContentLoaded", function() {
         text1.innerHTML = text1_content;
         text2.innerHTML = text2_content;
         text3.innerHTML = text3_content;
+
+        // add tooltips
+        Object.keys(ids2part).forEach((id, i) => {
+            const part = ids2part[id];
+            const nextId = Object.keys(ids2part)[i + 1];
+            const tips = tippy(`#${id}`, {
+                content: generateTippyContent(id, nextId, part),
+                placement: 'bottom',
+                arrow: true,
+                interactive: true,
+                hideOnClick: false,
+                trigger: 'manual',
+            });
+            tippies = tippies.concat(tips);
+            if (i === tippyIndex) {
+                tips[0].show();
+            }
+        });
 
         if (cursorPosition) {
             setCursorPosition(text2, cursorPosition);
