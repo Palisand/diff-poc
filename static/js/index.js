@@ -204,4 +204,16 @@ document.addEventListener("DOMContentLoaded", function() {
     diffIt();
     text2.addEventListener('keydown', moveToAdjacentSpan);
     text2.addEventListener('input', diffIt);
+
+    // submit button
+    document.getElementById('submit').addEventListener('click', async () => {
+        destroyAllTippies();  // so that tippy content is not included
+        const response = await fetch(
+            '/save',
+            {
+                method: 'POST',
+                body: text2.textContent,
+            }
+        );
+    });
 });

@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -11,6 +11,12 @@ def index():
             text1=lorem1.read(),
             text2=lorem2.read(),
         )
+
+
+@app.route("/save", methods=["POST"])
+def save():
+    print(request.data)
+    return request.data
 
 
 if __name__ == "__main__":
